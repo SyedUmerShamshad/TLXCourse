@@ -10,3 +10,4 @@ Feature: Demo Login
     Examples:
    | Username | Password |
    | standard_user | secret_sauce |
+   | visual_user   | secret_sauce |

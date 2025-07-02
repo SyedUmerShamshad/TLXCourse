@@ -1,6 +1,7 @@
 package stepDefinitions;
 
 import Utilities.baseclass;
+import io.cucumber.java.After;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
@@ -33,18 +34,30 @@ public class Login {
         driver.findElement(By.id("login-button")).click();
         System.out.println("Login button clicked");
     }
+
     @And("User clicks on {string}")
     public void user_clicks_on(String buttonId) {
         driver = sgp.getDriver();
         driver.findElement(By.id("react-burger-menu-btn")).click();
         System.out.println("Menu button clicked");
     }
+
     @And("User clicks at {string}")
     public void user_clicks_at(String buttonId) {
         driver = sgp.getDriver();
         driver.findElement(By.id("logout_sidebar_link")).click();
         System.out.println("Logout button clicked");
-        driver.quit();
     }
+    public class Hooks {
 
+        @After
+        public void tearDown() {
+            driver = sgp.getDriver();
+            if (driver != null) {
+                driver.quit();
+                System.out.println("Driver closed after scenario");
+            }
+        }
+    }
 }
+
