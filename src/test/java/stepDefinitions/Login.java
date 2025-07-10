@@ -1,5 +1,6 @@
 package stepDefinitions;
 
+import Utilities.ConfigReader;
 import Utilities.JsonReader;
 import Utilities.baseclass;
 import io.cucumber.java.After;
@@ -36,9 +37,11 @@ public class Login {
     @Given("User opens URL")
     public void user_opens_url() {
         String timestamp = new SimpleDateFormat("HH_mm_ss").format(new Date());
+        ConfigReader.loadProperties("config.properties"); // Load once at the start
+        String url = ConfigReader.getProperty("app.url");
         driver = sgp.getDriver();
-        driver.get("https://www.saucedemo.com/");
-        System.out.println("URL opened");
+        driver.get(url);
+        System.out.println("URL opened " + url);
         File f = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
         try {
             Files.copy(f.toPath(), new File("D:\\SeleniumTraining\\learnSelenium\\Screenshots\\Test_"+timestamp+".jpg").toPath());
