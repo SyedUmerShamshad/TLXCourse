@@ -6,8 +6,17 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class Login {
     baseclass sgp = new baseclass();
@@ -15,9 +24,16 @@ public class Login {
 
     @Given("User opens URL")
     public void user_opens_url() {
+        String timestamp = new SimpleDateFormat("HH_mm_ss").format(new Date());
         driver = sgp.getDriver();
         driver.get("https://www.saucedemo.com/");
         System.out.println("URL opened");
+        File f = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        try {
+            Files.copy(f.toPath(), new File("D:\\SeleniumTraining\\learnSelenium\\Screenshots\\Test_"+timestamp+".jpg").toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @When("^User enters (.*) and (.*)$")
