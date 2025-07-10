@@ -13,27 +13,25 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import com.github.javafaker.Faker;
+
 
 public class Login {
     baseclass sgp = new baseclass();
     WebDriver driver;
 
+    Faker faker = new Faker();
     List<Map<String, String>> testDataList = JsonReader.getTestData("src/test/resources/testData.json");
     String username;
     String password;
-    @Given("User loads test data at index {int}")
-    public void user_loads_test_data_at_index(int index) {
-        Map<String, String> userData = testDataList.get(index);
-        username = userData.get("username");
-        password = userData.get("password");
-        System.out.println("Loaded data: " + username + " / " + password);
-    }
+    String usernamef;
+    String passwordf;
+
     @Given("User opens URL")
     public void user_opens_url() {
         String timestamp = new SimpleDateFormat("HH_mm_ss").format(new Date());
@@ -50,13 +48,48 @@ public class Login {
         }
     }
 
+    @When("User enters invalid User and Pass")
+    public void user_enters_invalid_user_and_pass() {
+
+        driver = sgp.getDriver();
+        usernamef = faker.name().fullName();
+        passwordf = faker.internet().password(8, 16);  // generates a password of 8 to 16 chars
+
+        driver.findElement(By.id("user-name")).sendKeys(usernamef);
+        driver.findElement(By.id("password")).sendKeys(passwordf);
+
+        System.out.println("Random username: " + usernamef);
+        System.out.println("Random password: " + passwordf);
+
+        driver.findElement(By.id("user-name")).clear();
+        driver.findElement(By.id("password")).clear();
+
+        try {
+            Thread.sleep(5000);;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Given("User loads test data at index {int}")
+    public void user_loads_test_data_at_index(int index) {
+        Map<String, String> userData = testDataList.get(index);
+        username = userData.get("username");
+        password = userData.get("password");
+        System.out.println("Loaded data: " + username + " / " + password);
+    }
+
+
     @When("User enters username and password from JSON")
     public void user_enters_username_and_password() {
 
         driver = sgp.getDriver();
+        driver.findElement(By.id("user-name")).clear();
         driver.findElement(By.id("user-name")).sendKeys(username);
+        driver.findElement(By.id("password")).clear();
         driver.findElement(By.id("password")).sendKeys(password);
-        System.out.println("Entered username and password");
+        System.out.println("Entered username "+username+" and password "+password);
     }
 
     @And("User clicks {string}")
