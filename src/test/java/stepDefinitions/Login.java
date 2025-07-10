@@ -1,5 +1,6 @@
 package stepDefinitions;
 
+import org.example.pages.LoginPage;
 import Utilities.ConfigReader;
 import Utilities.JsonReader;
 import Utilities.baseclass;
@@ -24,7 +25,7 @@ import com.github.javafaker.Faker;
 public class Login {
     baseclass sgp = new baseclass();
     WebDriver driver;
-
+    LoginPage loginPage;
     Faker faker = new Faker();
     List<Map<String, String>> testDataList = JsonReader.getTestData("src/test/resources/testData.json");
     String username;
@@ -35,9 +36,10 @@ public class Login {
     @Given("User opens URL")
     public void user_opens_url() {
         String timestamp = new SimpleDateFormat("HH_mm_ss").format(new Date());
+        driver = sgp.getDriver();
+        loginPage = new LoginPage(driver);
         ConfigReader.loadProperties("config.properties"); // Load once at the start
         String url = ConfigReader.getProperty("app.url");
-        driver = sgp.getDriver();
         driver.get(url);
         System.out.println("URL opened " + url);
         File f = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
@@ -52,18 +54,14 @@ public class Login {
     public void user_enters_invalid_user_and_pass() {
 
         driver = sgp.getDriver();
-        usernamef = faker.name().fullName();
-        passwordf = faker.internet().password(8, 16);  // generates a password of 8 to 16 chars
+        usernamef = faker.name().username();
+        passwordf = faker.internet().password(8, 16);
 
-        driver.findElement(By.id("user-name")).sendKeys(usernamef);
-        driver.findElement(By.id("password")).sendKeys(passwordf);
+        loginPage.enterUsername(usernamef);
+        loginPage.enterPassword(passwordf);
 
         System.out.println("Random username: " + usernamef);
         System.out.println("Random password: " + passwordf);
-
-        driver.findElement(By.id("user-name")).clear();
-        driver.findElement(By.id("password")).clear();
-
         try {
             Thread.sleep(5000);;
         } catch (InterruptedException e) {
@@ -84,32 +82,29 @@ public class Login {
     @When("User enters username and password from JSON")
     public void user_enters_username_and_password() {
 
-        driver = sgp.getDriver();
-        driver.findElement(By.id("user-name")).clear();
-        driver.findElement(By.id("user-name")).sendKeys(username);
-        driver.findElement(By.id("password")).clear();
-        driver.findElement(By.id("password")).sendKeys(password);
-        System.out.println("Entered username "+username+" and password "+password);
+        loginPage.enterUsername(username);
+        loginPage.enterPassword(password);
+        System.out.println("Entered username " + username + " and password " + password);
     }
 
     @And("User clicks {string}")
     public void user_clicks(String buttonId) {
         driver = sgp.getDriver();
-        driver.findElement(By.id("login-button")).click();
+        loginPage.clickLogin();
         System.out.println("Login button clicked");
     }
 
     @And("User clicks on {string}")
     public void user_clicks_on(String buttonId) {
         driver = sgp.getDriver();
-        driver.findElement(By.id("react-burger-menu-btn")).click();
+        loginPage.openMenu();
         System.out.println("Menu button clicked");
     }
 
     @And("User clicks at {string}")
     public void user_clicks_at(String buttonId) {
         driver = sgp.getDriver();
-        driver.findElement(By.id("logout_sidebar_link")).click();
+        loginPage.clickLogout();
         System.out.println("Logout button clicked");
     }
     public class Hooks {
