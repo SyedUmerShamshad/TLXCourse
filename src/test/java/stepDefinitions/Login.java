@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import com.github.javafaker.Faker;
+import org.testng.Assert; // For Hard Assertions
+import org.testng.asserts.SoftAssert; // For Soft Assertions
 
 
 public class Login {
@@ -92,6 +94,9 @@ public class Login {
         driver = sgp.getDriver();
         loginPage.clickLogin();
         System.out.println("Login button clicked");
+        String expectedUrl = "https://www.saucedemo.com/inventory.html";
+        String actualUrl = driver.getCurrentUrl();
+        Assert.assertEquals(actualUrl, expectedUrl, "User did not land on expected inventory page");
     }
 
     @And("User clicks on {string}")
