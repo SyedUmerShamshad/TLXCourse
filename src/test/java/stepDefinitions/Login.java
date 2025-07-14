@@ -8,10 +8,8 @@ import io.cucumber.java.After;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.io.File;
@@ -22,6 +20,12 @@ import java.util.Map;
 import com.github.javafaker.Faker;
 import org.testng.Assert; // For Hard Assertions
 import org.testng.asserts.SoftAssert; // For Soft Assertions
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.time.Duration;
+import java.util.NoSuchElementException;
 
 
 public class Login {
@@ -90,20 +94,38 @@ public class Login {
     }
 
     @And("User clicks {string}")
-    public void user_clicks(String buttonId) {
+    public void user_clicks(String buttonId) throws InterruptedException {
         driver = sgp.getDriver();
         loginPage.clickLogin();
         System.out.println("Login button clicked");
         String expectedUrl = "https://www.saucedemo.com/inventory.html";
         String actualUrl = driver.getCurrentUrl();
         Assert.assertEquals(actualUrl, expectedUrl, "User did not land on expected inventory page");
+        Thread.sleep(5000);
     }
 
     @And("User clicks on {string}")
     public void user_clicks_on(String buttonId) {
         driver = sgp.getDriver();
-        loginPage.openMenu();
-        System.out.println("Menu button clicked");
+
+        try {
+            FluentWait<WebDriver> wait = new FluentWait<>(driver)
+                    .withTimeout(Duration.ofSeconds(8))
+                    .pollingEvery(Duration.ofSeconds(2))
+                    .ignoring(NoSuchElementException.class);
+
+            WebElement menuButton = wait.until(d -> {
+                WebElement el = d.findElement(By.id("login-button"));
+
+                return (el.isDisplayed() && el.isEnabled()) ? el : null;
+            });
+            menuButton.click();
+
+        } catch (Exception e) {
+            System.out.println("Menu button wait timed out. Falling back to default openMenu().");
+            loginPage.openMenu();
+        }
+
     }
 
     @And("User clicks at {string}")
